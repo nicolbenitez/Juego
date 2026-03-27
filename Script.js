@@ -1,202 +1,92 @@
-// Extensión útil
-Array.prototype.last = function () {
-    return this[this.length - 1];
-};
-
-// Variables del juego
-let phase = "waiting";
-let lastTimestamp;
-
-let heroX;
-let heroY = 0;
-let sceneOffset = 0;
-
-let platforms = [];
-let sticks = [];
-
-let score = 0;
-
-// Configuración
-const canvas = document.getElementById("game");
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+// --- Variables de configuración ---
+const canvas = document.getElementById("gameCanvas"); // Asegúrate de tener este ID en tu HTML
 const ctx = canvas.getContext("2d");
 
-const introductionElement = document.getElementById("introduction");
-const perfectElement = document.getElementById("perfect");
-const restartButton = document.getElementById("restart");
-const scoreElement = document.getElementById("score");
+// Ajustar tamaño del canvas al de la ventana
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
-const platformHeight = 100;
-const heroDistanceFromEdge = 10;
+let sceneOffset = 0; // Esto controla el movimiento del fondo
+const backgroundSpeedMultiplier = 0.2;
+const treeCrownWidth = 20;
+const treeCrownHeight = 30;
+const treeTrunkHeight = 15;
 
-const stretchingSpeed = 4;
-const turningSpeed = 4;
-const walkingSpeed = 4;
-const transitioningSpeed = 2;
-const fallingSpeed = 2;
+// --- Tus funciones de la imagen (Corregidas) ---
 
-const heroWidth = 20;
-const heroHeight = 30;
-
-// RESET
-function resetGame() {
-    phase = "waiting";
-    lastTimestamp = undefined;
-    sceneOffset = 0;
-    score = 0;
-
-    introductionElement.style.opacity = 1;
-    restartButton.style.display = "none";
-    scoreElement.innerText = score;
-
-    platforms = [{ x: 50, w: 50 }];
-    generatePlatform();
-    generatePlatform();
-
-    sticks = [{
-        x: platforms[0].x + platforms[0].w,
-        length: 0,
-        rotation: 0
-    }];
-
-    heroX = platforms[0].x + platforms[0].w - heroDistanceFromEdge;
-    heroY = 0;
-
-    draw();
-}
-
-// GENERAR PLATAFORMAS
-function generatePlatform() {
-    const last = platforms[platforms.length - 1];
-    const gap = 50 + Math.random() * 100;
-    const width = 30 + Math.random() * 70;
-
-    platforms.push({
-        x: last.x + last.w + gap,
-        w: width
-    });
-}
-
-// EVENTOS
-window.addEventListener("mousedown", () => {
-    if (phase === "waiting") {
-        phase = "stretching";
-        introductionElement.style.opacity = 0;
-        window.requestAnimationFrame(animate);
-    }
-});
-
-window.addEventListener("mouseup", () => {
-    if (phase === "stretching") {
-        phase = "turning";
-    }
-});
-
-restartButton.addEventListener("click", resetGame);
-
-// LOOP PRINCIPAL
-function animate(timestamp) {
-    if (!lastTimestamp) {
-        lastTimestamp = timestamp;
-        window.requestAnimationFrame(animate);
-        return;
-    }
-
-    const delta = timestamp - lastTimestamp;
-
-    switch (phase) {
-        case "waiting":
-            return;
-
-        case "stretching":
-            sticks.last().length += delta / stretchingSpeed;
-            break;
-
-        case "turning":
-            sticks.last().rotation += delta / turningSpeed;
-
-            if (sticks.last().rotation >= 90) {
-                sticks.last().rotation = 90;
-                phase = "walking";
-            }
-            break;
-
-        case "walking":
-            heroX += delta / walkingSpeed;
-
-            const stick = sticks.last();
-            const targetX = stick.x + stick.length;
-
-            if (heroX > targetX) {
-                phase = "falling";
-            }
-            break;
-
-        case "falling":
-            heroY += delta / fallingSpeed;
-
-            if (heroY > canvas.height) {
-                restartButton.style.display = "block";
-                return;
-            }
-            break;
-    }
-
-    draw();
-    lastTimestamp = timestamp;
-    window.requestAnimationFrame(animate);
-}
-
-// DIBUJAR
-function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    drawPlatforms();
-    drawStick();
-    drawHero();
-}
-
-// PLATAFORMAS
-function drawPlatforms() {
-    ctx.fillStyle = "black";
-
-    platforms.forEach(p => {
-        ctx.fillRect(
-            p.x,
-            canvas.height - platformHeight,
-            p.w,
-            platformHeight
-        );
-    });
-}
-
-// PALO
-function drawStick() {
-    const stick = sticks.last();
-
-    ctx.save();
-    ctx.translate(stick.x, canvas.height - platformHeight);
-    ctx.rotate((Math.PI / 180) * stick.rotation);
-
-    ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.lineTo(0, -stick.length);
-    ctx.stroke();
-
-    ctx.restore();
-}
-
-// PERSONAJE
-function drawHero() {
-    ctx.fillStyle = "black";
-    ctx.fillRect(
-        heroX - heroWidth / 2,
-        canvas.height - platformHeight - heroHeight - heroY,
-        heroWidth,
-        heroHeight
+function getHilly(windowX, baseHeight, amplitude, stretch) {
+    const sineBaseY = window.innerHeight - baseHeight;
+    return (
+        Math.sin((sceneOffset * backgroundSpeedMultiplier + windowX) * stretch) *
+        amplitude +
+        sineBaseY
     );
 }
 
-// INICIO
-resetGame();
+function getTreeY(x, baseHeight, amplitude) {
+    const sineBaseY = window.innerHeight - baseHeight;
+    // Corregido: Math.sin en lugar de Math.sinus
+    return Math.sin(x) * amplitude + sineBaseY;
+}
+
+function drawCrown(color) {
+    ctx.beginPath();
+    ctx.moveTo(-treeCrownWidth / 2, -treeTrunkHeight);
+    ctx.lineTo(0, -(treeTrunkHeight + treeCrownHeight));
+    ctx.lineTo(treeCrownWidth / 2, -treeTrunkHeight);
+    ctx.fillStyle = color;
+    ctx.fill();
+}
+
+// --- Funciones de dibujo adicionales para el estilo visual ---
+
+function drawScene() {
+    // 1. Limpiar y pintar el cielo (color crema de la imagen)
+    ctx.fillStyle = "#f0f0d8"; 
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // 2. Dibujar las colinas verdes
+    ctx.beginPath();
+    ctx.moveTo(0, canvas.height);
+    for (let x = 0; x <= canvas.width; x++) {
+        // Generamos la curva usando tu lógica
+        const y = getHilly(x, 120, 30, 0.01);
+        ctx.lineTo(x, y);
+    }
+    ctx.lineTo(canvas.width, canvas.height);
+    ctx.fillStyle = "#91cb3e"; // Verde de la imagen
+    ctx.fill();
+
+    // 3. Dibujar árboles (opcional, en puntos específicos de la colina)
+    ctx.save();
+    ctx.translate(100, getHilly(100, 120, 30, 0.01)); // Ejemplo de posición
+    drawCrown("#4a7c2a");
+    ctx.restore();
+
+    // 4. Dibujar plataformas (estilo Stick Hero)
+    drawPlatform(50, 60);  // Plataforma inicial
+    drawPlatform(250, 40); // Siguiente plataforma
+}
+
+function drawPlatform(x, width) {
+    const platformHeight = 250;
+    const y = canvas.height - platformHeight;
+
+    // Cuerpo negro
+    ctx.fillStyle = "black";
+    ctx.fillRect(x, y, width, platformHeight);
+
+    // Punto rojo de bonus
+    const bonusSize = 8;
+    ctx.fillStyle = "red";
+    ctx.fillRect(x + (width / 2) - (bonusSize / 2), y, bonusSize, bonusSize);
+}
+
+// --- Bucle de animación ---
+function animate() {
+    // sceneOffset += 1; // Descomenta esto para que las colinas se muevan
+    drawScene();
+    requestAnimationFrame(animate);
+}
+
+animate();
