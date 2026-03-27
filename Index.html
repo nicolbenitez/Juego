@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Juego Stick</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: Arial;
+        }
+
+        #introduction {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            text-align: center;
+            font-size: 20px;
+        }
+
+        #perfect {
+            position: absolute;
+            top: 40%;
+            width: 100%;
+            text-align: center;
+            font-size: 30px;
+            color: red;
+            opacity: 0;
+        }
+
+        #score {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 20px;
+        }
+
+        #restart {
+            position: absolute;
+            top: 60%;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="game"></canvas>
+
+<div id="introduction">Mantén clic para estirar el palo</div>
+<div id="perfect">¡Perfecto!</div>
+<div id="score">0</div>
+<button id="restart">Reiniciar</button>
+
+<script src="game.js"></script>
+
+</body>
+</html>
