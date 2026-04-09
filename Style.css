@@ -1,69 +1,57 @@
-body {
-    margin: 0;
-    overflow: hidden;
-    font-family: Arial, sans-serif;
-    background: #000; /* evita fondo blanco raro */
+  html,
+  body { 
+    height: 100%;
+     margin: 0;
+  }
+
+ body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    cursor: pointer;
+ }    
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
 }
 
-/* Canvas ocupa toda la pantalla */
-canvas {
-    display: block;
-}
-
-/* Texto inicial */
-#introduction {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 22px;
-    color: #333;
-    text-align: center;
-    transition: opacity 0.5s;
-}
-
-/* Texto PERFECTO */
-#perfect {
-    position: absolute;
-    top: 40%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 32px;
-    color: red;
-    font-weight: bold;
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-
-/* Puntaje */
 #score {
     position: absolute;
-    top: 20px;
-    right: 20px;
-    font-size: 22px;
-    font-weight: bold;
-    color: black;
-    background: rgba(255,255,255,0.6);
-    padding: 5px 10px;
-    border-radius: 10px;
+    top: 30px;
+    right: 30px;
+    font-size: 2em;
+    font-weight: 900;
 }
 
-/* Botón reiniciar */
-#restart {
+#introduction {
+    width: 200px;
+    height: 150px;
     position: absolute;
-    top: 60%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    display: none;
-    padding: 10px 20px;
-    font-size: 18px;
-    border: none;
-    border-radius: 10px;
-    background: black;
-    color: white;
-    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.8em;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    text-align: center;
+    transition: opacity 2s;
 }
 
-#restart:hover {
-    background: #333;
+#restart {
+    width: 120px;
+    height: 120px;
+    position: absolute;
+   border-radius: 50%;
+   color: white;
+   background-color: red;
+   border: none;
+   font-weight: 700;
+   font-size: 1.2em;
+   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+   display: none;
+   cursor: pointer;
+}
+
+#perfect{
+    position: absolute;
+    opacity: 0;
+    transition: opacity 2s;
 }
